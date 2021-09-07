@@ -1,1 +1,172 @@
-hello 袁彩倩
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8" />
+		<title>计算器</title>
+		<script type="text/javascript" src="https://cdn.bootcss.com/vue/2.5.16/vue.min.js"></script>
+		<style type="text/css">
+			* {
+				margin: 0;
+				padding: 0;
+				border: 0;
+			}
+			
+			#a {
+				width: 350px;
+				height: 600px;
+				margin: 0 auto;
+				background-color: black;
+				position: absolute;
+			}
+			
+			.b {
+				width: 100%;
+				height: 80%;
+			}
+			
+			.b ul {
+				display: flex;
+				justify-content: space-evenly;
+				margin-top: 10px;
+			}
+			
+			.b ul li {
+				width: 80px;
+				height: 80px;
+				border-radius: 50%;
+				text-align: center;
+				line-height: 80px;
+				list-style: none;
+				cursor: pointer;
+			}
+			
+			.white {
+				color: white;
+			}
+			
+			.black {
+				color: black;
+			}
+			
+			.darkgrey {
+				background-color: darkgrey;
+			}
+			
+			.orange {
+				background-color: orange;
+			}
+			
+			#input-box {
+				width: 100%;
+				display: flex;
+				margin-top: 60px;
+				text-align: right;
+				background-color: black;
+				color: white;
+				border: 0;
+				font-size: 70px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="a">
+			<input-box v-bind:input-show="inputShow"></input-box>
+			<div class="b">
+				<ul>
+					<li class="darkgrey black" @click="clear()">AC</li>
+					<li class="darkgrey black">无</li>
+					<li class="darkgrey black" @click="inputValue('%')">%</li>
+					<li class="orange white" @click="inputValue('÷')">÷</li>
+				</ul>
+				<ul>
+					<li class="darkgrey white" @click="inputValue('7')">7</li>
+					<li class="darkgrey white" @click="inputValue('8')">8</li>
+					<li class="darkgrey white" @click="inputValue('9')">9</li>
+					<li class="orange white" @click="inputValue('×')">×</li>
+				</ul>
+				<ul>
+					<li class="darkgrey white" @click="inputValue('4')">4</li>
+					<li class="darkgrey white" @click="inputValue('5')">5</li>
+					<li class="darkgrey white" @click="inputValue('6')">6</li>
+					<li class="orange white" @click="inputValue('-')">-</li>
+				</ul>
+				<ul>
+					<li class="darkgrey white" @click="inputValue('1')">1</li>
+					<li class="darkgrey white" @click="inputValue('2')">2</li>
+					<li class="darkgrey white" @click="inputValue('3')">3</li>
+					<li class="orange white" @click="inputValue('+')">+</li>
+				</ul>
+				<ul>
+					<li class="darkgrey white" style="width: 155px; border-radius: 45%;" @click="inputValue('0')">0</li>
+					<li class="darkgrey white" @click="inputValue('.')">.</li>
+					<li class="orange white" @click="calValue()">=</li>
+				</ul>
+			</div>
+		</div>
+		<script>
+			var a = new Vue({
+				el: '#a',
+				data: {
+					inputShow: {
+						value: '0'
+					}
+				},
+				components: {    
+					'input-box': {      
+						props: ['inputShow'],
+						      computed: {        
+							value: function() {          
+								return this.inputShow.value        
+							}      
+						},
+						      template: '<input id="input-box" type="text" v-model="value" readonly="readonly">'    
+					},
+					    'btn-list': {      
+						template: '<div id="btn-list"><slot></slot></div>'    
+					}  
+				},
+				methods: {
+					//清除
+					clear() {
+						this.inputShow.value = '0';
+					},
+					inputValue(param) {      
+						if(Object.prototype.toString.call(this.inputShow.value) == "[object Number]") {   //判断输入框内容是否为数字类型
+							this.inputShow.value = "0";   //数字类型说明是上个计算结果,清空内容
+						}      
+						var str = '' + this.inputShow.value; //输入内容时,将输入框内容转为字符串类型
+						var len = str.length;      
+						var arr = ["+", "-", "×", "÷"];      
+						var num = ('' + parseFloat(str.split('').reverse().join(''))).split('').reverse().join('');   //parseInt(str.split('').reverse().join('')))是获取输入框内最后一串数字,再反转回来 ,num为输入框内最后一串数字
+						var nlen = num.length;      
+						if((num != '0' && param != '.') || (param == '.' && num.indexOf(".") == -1)) {   //输入框内最后一串数字不为0时拼接字符串
+							if(arr.indexOf(str.charAt(len - 1)) != -1 && arr.indexOf(param) != -1) {    //若一开始输入内容为运算符,输入无效
+								return;        
+							}        
+							this.inputShow.value += param;   //拼接输入内容
+						} else {        
+							arr.push("%");        
+							if(param == '.') {      //若num中已有小数点,输入内容为小数点,视为无效
+								return;        
+							} else if(!(arr.indexOf(param) != -1)) {    //判断输入框内最后一个字符不为运算符
+								this.inputShow.value = str.substring(0, str.length - nlen) + param;  //输入框内最后一串数字为0时,删除0拼接
+							}      
+						}    
+					},
+					calValue() {       //计算结果
+						var str = this.inputShow.value;      
+						str = str.replace('×','*').replace('÷', '/').replace('%', '*0.01');    //替换运算符
+						try {        
+							this.inputShow.value = eval(str);      //若用户输入内容不符合运算规则,不计算
+						} catch(error) {        
+							return;      
+						}    
+					},
+				}
+			})
+		</script>
+	</body>
+
+</html>
