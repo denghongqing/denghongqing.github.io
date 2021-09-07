@@ -22,7 +22,7 @@
 			
 			.b {
 				width: 100%;
-				height: 80%;
+				height: 75%;
 			}
 			
 			.b ul {
@@ -45,6 +45,10 @@
 				color: white;
 			}
 			
+			.white:hover {
+				color: black;
+			}
+			
 			.black {
 				color: black;
 			}
@@ -53,8 +57,19 @@
 				background-color: darkgrey;
 			}
 			
+			.darkgrey:hover {
+				transition: border linear .2s, -webkit-box-shadow linear .5s;
+				background-color: aliceblue;
+			}
+			
 			.orange {
 				background-color: orange;
+			}
+			
+			.orange:hover {
+				transition: border linear .2s, -webkit-box-shadow linear .5s;
+				background-color: white;
+				color: black;
 			}
 			
 			#input-box {
@@ -105,6 +120,9 @@
 					<li class="orange white" @click="calValue()">=</li>
 				</ul>
 			</div>
+			<div class="c">
+				<p id="record"></p>
+			</div>
 		</div>
 		<script>
 			var a = new Vue({
@@ -112,58 +130,78 @@
 				data: {
 					inputShow: {
 						value: '0'
-					}
+					},
 				},
-				components: {    
-					'input-box': {      
+				components: {
+					'input-box': {
 						props: ['inputShow'],
-						      computed: {        
-							value: function() {          
+						      computed: {
+							value: function() {
 								return this.inputShow.value        
-							}      
+							}
 						},
 						      template: '<input id="input-box" type="text" v-model="value" readonly="readonly">'    
 					},
-					    'btn-list': {      
-						template: '<div id="btn-list"><slot></slot></div>'    
-					}  
+					    'btn-list': {
+						template: '<div id="btn-list"><slot></slot></div>'
+					}
 				},
 				methods: {
 					//清除
 					clear() {
 						this.inputShow.value = '0';
 					},
-					inputValue(param) {      
-						if(Object.prototype.toString.call(this.inputShow.value) == "[object Number]") {   //判断输入框内容是否为数字类型
-							this.inputShow.value = "0";   //数字类型说明是上个计算结果,清空内容
-						}      
-						var str = '' + this.inputShow.value; //输入内容时,将输入框内容转为字符串类型
-						var len = str.length;      
-						var arr = ["+", "-", "×", "÷"];      
-						var num = ('' + parseFloat(str.split('').reverse().join(''))).split('').reverse().join('');   //parseInt(str.split('').reverse().join('')))是获取输入框内最后一串数字,再反转回来 ,num为输入框内最后一串数字
-						var nlen = num.length;      
-						if((num != '0' && param != '.') || (param == '.' && num.indexOf(".") == -1)) {   //输入框内最后一串数字不为0时拼接字符串
-							if(arr.indexOf(str.charAt(len - 1)) != -1 && arr.indexOf(param) != -1) {    //若一开始输入内容为运算符,输入无效
+					inputValue(param) {
+						//判断输入框内容是否为数字类型
+						if(Object.prototype.toString.call(this.inputShow.value) == "[object Number]") {  
+							//数字类型说明是上个计算结果,清空内容
+							this.inputShow.value = "0";
+						}
+						//输入内容时,将输入框内容转为字符串类型
+						var str = '' + this.inputShow.value;
+						var len = str.length;
+						var arr = ["+", "-", "×", "÷"];
+						//parseInt(str.split('').reverse().join('')))是获取输入框内最后一串数字,再反转回来 ,num为输入框内最后一串数字
+						var num = ('' + parseFloat(str.split('').reverse().join(''))).split('').reverse().join('');  
+						var nlen = num.length;
+						//输入框内最后一串数字不为0时拼接字符串
+						if((num != '0' && param != '.') || (param == '.' && num.indexOf(".") == -1)) {
+							//若一开始输入内容为运算符,输入无效
+							if(arr.indexOf(str.charAt(len - 1)) != -1 && arr.indexOf(param) != -1) {
 								return;        
-							}        
-							this.inputShow.value += param;   //拼接输入内容
+							}
+							//拼接输入内容
+							this.inputShow.value += param;
 						} else {        
-							arr.push("%");        
-							if(param == '.') {      //若num中已有小数点,输入内容为小数点,视为无效
-								return;        
-							} else if(!(arr.indexOf(param) != -1)) {    //判断输入框内最后一个字符不为运算符
-								this.inputShow.value = str.substring(0, str.length - nlen) + param;  //输入框内最后一串数字为0时,删除0拼接
-							}      
-						}    
+							arr.push("%");
+							//若num中已有小数点,输入内容为小数点,视为无效 
+							if(param == '.') {
+								return;
+								//判断输入框内最后一个字符不为运算符
+							} else if(!(arr.indexOf(param) != -1)) {
+								//输入框内最后一串数字为0时,删除0拼接
+								this.inputShow.value = str.substring(0, str.length - nlen) + param;
+							}
+						}
 					},
-					calValue() {       //计算结果
-						var str = this.inputShow.value;      
-						str = str.replace('×','*').replace('÷', '/').replace('%', '*0.01');    //替换运算符
-						try {        
-							this.inputShow.value = eval(str);      //若用户输入内容不符合运算规则,不计算
-						} catch(error) {        
-							return;      
-						}    
+					calValue() {  
+						//计算结果
+						var str = this.inputShow.value;   
+						str = str.replace('×', '*').replace('÷', '/').replace('%', '*0.01');
+						//替换运算符
+						try {
+							//若用户输入内容不符合运算规则,不计算
+							this.inputShow.value = eval(str);  
+						} catch(error) {
+							return; 
+						}
+						localStorage.setItem("record", this.inputShow.value);
+						let ycq = localStorage.getItem("record");
+						var dhq = ['计算记录'];
+						dhq.push(ycq);
+						var cq = document.getElementById("record");
+						cq.innerHTML = dhq;
+						console.log(dhq);
 					},
 				}
 			})
