@@ -10,11 +10,12 @@
 				margin: 0;
 				padding: 0;
 				border: 0;
+				font-size: 60px;
 			}
 			
 			#a {
-				width: 350px;
-				height: 600px;
+				width: 100%;
+				height: 1320px;
 				margin: 0 auto;
 				background-color: black;
 				position: absolute;
@@ -28,15 +29,15 @@
 			.b ul {
 				display: flex;
 				justify-content: space-evenly;
-				margin-top: 10px;
+				margin-top: 30px;
 			}
 			
 			.b ul li {
-				width: 80px;
-				height: 80px;
+				width: 200px;
+				height: 200px;
 				border-radius: 50%;
 				text-align: center;
-				line-height: 80px;
+				line-height: 200px;
 				list-style: none;
 				cursor: pointer;
 			}
@@ -86,7 +87,7 @@
 	</head>
 
 	<body>
-		<h1 style="width: 350px; text-align: center;">hello ycq</h1>
+		<h1 style="text-align: center;">hello ycq</h1>
 		<div id="a">
 			<input-box v-bind:input-show="inputShow"></input-box>
 			<div class="b">
@@ -115,12 +116,12 @@
 					<li class="orange white" @click="inputValue('+')">+</li>
 				</ul>
 				<ul>
-					<li class="darkgrey white" style="width: 155px; border-radius: 45%;" @click="inputValue('0')">0</li>
+					<li class="darkgrey white" style="width: 400px; height: 200px; border-radius: 45%;" @click="inputValue('0')">0</li>
 					<li class="darkgrey white" @click="inputValue('.')">.</li>
 					<li class="orange white" @click="calValue()">=</li>
 				</ul>
 			</div>
-			<div class="c">
+			<div class="c" style="margin-top: 160px;">
 				<p id="record"></p>
 			</div>
 		</div>
